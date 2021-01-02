@@ -2,11 +2,8 @@
 
 namespace Omnipay\PayPal;
 
-use Omnipay\Common\CreditCard;
-use Omnipay\PayPal\Message\RestCreateWebhookRequest;
-use Omnipay\PayPal\Message\RestListWebhooksRequest;
-use Omnipay\PayPal\Message\RestVerifyWebhookSignatureRequest;
 use Omnipay\Tests\GatewayTestCase;
+use Omnipay\Common\CreditCard;
 
 class RestGatewayTest extends GatewayTestCase
 {
@@ -34,7 +31,7 @@ class RestGatewayTest extends GatewayTestCase
                 'lastName' => 'User',
                 'number' => '4111111111111111',
                 'expiryMonth' => '12',
-                'expiryYear' => date('Y'),
+                'expiryYear' => '2017',
                 'cvv' => '123',
             )),
         );
@@ -221,15 +218,6 @@ class RestGatewayTest extends GatewayTestCase
         $this->assertNull($response->getMessage());
     }
 
-    public function testCreateWebhook()
-    {
-        $request = $this->gateway->createWebhook([]);
-
-        $this->assertInstanceOf(RestCreateWebhookRequest::class, $request);
-        $this->assertSame('https://api.paypal.com/v1/notifications/webhooks', $request->getEndpoint());
-        $this->assertEquals(['event_types' => [], 'url' => null], $request->getData());
-    }
-
     public function testPayWithSavedCard()
     {
         $this->setMockHttpResponse('RestCreateCardSuccess.txt');
@@ -289,7 +277,7 @@ class RestGatewayTest extends GatewayTestCase
         $this->assertSame('abc123', $request->getTransactionReference());
         $endPoint = $request->getEndpoint();
         $this->assertSame('https://api.paypal.com/v1/payments/capture/abc123/refund', $endPoint);
-
+        
         $request->setAmount('15.99');
         $request->setCurrency('BRL');
         $request->setDescription('Test Description');
@@ -311,34 +299,5 @@ class RestGatewayTest extends GatewayTestCase
         $this->assertSame('https://api.paypal.com/v1/payments/authorization/abc123/void', $endPoint);
         $data = $request->getData();
         $this->assertEmpty($data);
-    }
-
-    public function testListWebhooks()
-    {
-        $request = $this->gateway->listWebhooks([]);
-
-        $this->assertInstanceOf(RestListWebhooksRequest::class, $request);
-        $this->assertSame('https://api.paypal.com/v1/notifications/webhooks', $request->getEndpoint());
-        $this->assertEmpty($request->getData());
-    }
-
-    public function testVerifyWebhook()
-    {
-        $request = $this->gateway->verifyWebhookSignature([]);
-
-        $this->assertInstanceOf(RestVerifyWebhookSignatureRequest::class, $request);
-        $this->assertSame('https://api.paypal.com/v1/notifications/verify-webhook-signature', $request->getEndpoint());
-        $this->assertEquals(
-            [
-                'transmission_id' => null,
-                'auth_algo' => null,
-                'cert_url' => null,
-                'transmission_sig' => null,
-                'transmission_time' => null,
-                'webhook_event' => null,
-                'webhook_id' => null,
-            ],
-            $request->getData()
-        );
     }
 }

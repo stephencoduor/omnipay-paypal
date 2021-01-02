@@ -3,7 +3,6 @@
 namespace Omnipay\PayPal\Message;
 
 use Omnipay\Common\CreditCard;
-use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\PayPal\Message\ExpressAuthorizeRequest;
 use Omnipay\PayPal\Support\InstantUpdateApi\BillingAgreement;
 use Omnipay\PayPal\Support\InstantUpdateApi\ShippingOption;
@@ -307,8 +306,10 @@ class ExpressAuthorizeRequestTest extends TestCase
             'shippingOptions' => $shippingOptions,
         )));
 
-        $this->expectException(InvalidRequestException::class);
-        $this->expectExceptionMessage('One of the supplied shipping options must be set as default');
+        $this->setExpectedException(
+            '\Omnipay\Common\Exception\InvalidRequestException',
+            'One of the supplied shipping options must be set as default'
+        );
 
         $this->request->getData();
     }
@@ -320,8 +321,10 @@ class ExpressAuthorizeRequestTest extends TestCase
 
         $this->request->initialize($baseData);
 
-        $this->expectException(InvalidRequestException::class);
-        $this->expectExceptionMessage('The amount parameter is required');
+        $this->setExpectedException(
+            '\Omnipay\Common\Exception\InvalidRequestException',
+            'The amount parameter is required'
+        );
 
         $this->request->getData();
     }
@@ -334,8 +337,10 @@ class ExpressAuthorizeRequestTest extends TestCase
 
         $this->request->initialize($baseData);
 
-        $this->expectException(InvalidRequestException::class);
-        $this->expectExceptionMessage('The returnUrl parameter is required');
+        $this->setExpectedException(
+            '\Omnipay\Common\Exception\InvalidRequestException',
+            'The returnUrl parameter is required'
+        );
 
         $this->request->getData();
     }
@@ -363,7 +368,7 @@ class ExpressAuthorizeRequestTest extends TestCase
         // from the docblock on this exception -
         // Thrown when a request is invalid or missing required fields.
         // callback has been set but no shipping options so expect one of these:
-        $this->expectException(InvalidRequestException::class);
+        $this->setExpectedException('\Omnipay\Common\Exception\InvalidRequestException');
 
         $this->request->getData();
     }
@@ -408,8 +413,10 @@ class ExpressAuthorizeRequestTest extends TestCase
      */
     public function testGetDataWithBillingAgreementWrongPaymentType()
     {
-        $this->expectException(InvalidRequestException::class);
-        $this->expectExceptionMessage("The 'paymentType' parameter can be only 'Any' or 'InstantOnly'");
+        $this->setExpectedException(
+            '\Omnipay\Common\Exception\InvalidRequestException',
+            "The 'paymentType' parameter can be only 'Any' or 'InstantOnly'"
+        );
 
         $billingAgreement = new BillingAgreement(false, 'Some Stuff', 'BadType', 'Some custom annotation');
     }
